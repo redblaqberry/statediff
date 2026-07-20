@@ -1,0 +1,12 @@
+{
+  "defect_class": "rewritten-history",
+  "derived_from": "baseline/hold/after-snapshot.json",
+  "before": "baseline/hold/mid-snapshot.json",
+  "scenario": "scenarios/hold-compensation.yaml",
+  "expect": {
+    "status": "fail",
+    "failing_checks_include": [
+      "append_only"
+    ]
+  }
+}

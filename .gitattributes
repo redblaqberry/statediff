@@ -1,0 +1,3 @@
+# Fixtures are byte-compared against deterministic regeneration; no line
+# ending conversion may ever touch them.
+fixtures/** -text

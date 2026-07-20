@@ -1,0 +1,120 @@
+{
+  "format": "canonical-vectors.v1",
+  "vectors": [
+    {
+      "name": "key-sorting-basic",
+      "doc": {
+        "b": 1,
+        "a": 2,
+        "aa": 3,
+        "A": 4
+      },
+      "canonical": "{\"A\":4,\"a\":2,\"aa\":3,\"b\":1}",
+      "sha256": "9c0f43adde6d436733e8bc3f11edbe1ec08de15dbc823e44031254212cf3b83a"
+    },
+    {
+      "name": "utf16-code-unit-ordering",
+      "doc": {
+        "0": 6,
+        "z": 1,
+        "é": 2,
+        "😀": 3,
+        "�": 4,
+        "Z": 5
+      },
+      "canonical": "{\"0\":6,\"Z\":5,\"z\":1,\"é\":2,\"😀\":3,\"�\":4}",
+      "sha256": "e06ffd0b001afccd1468e3330c4e75043bc57d044d25e47b1ec68fe37e38545b"
+    },
+    {
+      "name": "nested-structures",
+      "doc": {
+        "outer": {
+          "y": [
+            1,
+            null,
+            {
+              "k": "v"
+            }
+          ],
+          "x": null
+        },
+        "list": [
+          {
+            "b": 1,
+            "a": 2
+          }
+        ]
+      },
+      "canonical": "{\"list\":[{\"a\":2,\"b\":1}],\"outer\":{\"x\":null,\"y\":[1,null,{\"k\":\"v\"}]}}",
+      "sha256": "60674897ed32f7d14dd2db16af3cd37cf40201a6dafb52e3153d9e501a12d0b4"
+    },
+    {
+      "name": "payload-json-embedded-string",
+      "doc": {
+        "payload_json": "{\"approval_id\":\"APR-0001\",\"note\":\"quote \\\" and slash \\\\ and é\"}"
+      },
+      "canonical": "{\"payload_json\":\"{\\\"approval_id\\\":\\\"APR-0001\\\",\\\"note\\\":\\\"quote \\\\\\\" and slash \\\\\\\\ and é\\\"}\"}",
+      "sha256": "c765b80468056a1c66f38cb3a97db867b5f2e0c252587d9e16d0799c1b082cd9"
+    },
+    {
+      "name": "empty-structures",
+      "doc": {
+        "empty_obj": {},
+        "empty_arr": [],
+        "s": ""
+      },
+      "canonical": "{\"empty_arr\":[],\"empty_obj\":{},\"s\":\"\"}",
+      "sha256": "c603491f4c59ce807be5ecced03ac87e5c110824815ff95525d9d3332d82e4e7"
+    },
+    {
+      "name": "scalars",
+      "doc": {
+        "t": true,
+        "f": false,
+        "n": null,
+        "i": 0,
+        "neg": -7,
+        "big": 210000
+      },
+      "canonical": "{\"big\":210000,\"f\":false,\"i\":0,\"n\":null,\"neg\":-7,\"t\":true}",
+      "sha256": "015209f7e03c281861d1f28abdce1d2906ac90eb154dbc046eb873de82de61fa"
+    },
+    {
+      "name": "event-rows-shape",
+      "doc": [
+        {
+          "event_id": "EVT-0001",
+          "mutation_seq": 1,
+          "ts": "2026-01-05T09:00:01.000Z",
+          "actor": "ap_approver",
+          "system": "erp",
+          "type": "PAYMENT_RELEASED",
+          "entity_type": "invoice",
+          "entity_id": "INV-2026-00347",
+          "payload_json": "{\"payment_id\":\"PAY-0001\",\"amount_cents\":210000,\"approval_id\":\"APR-0001\"}"
+        },
+        {
+          "event_id": "EVT-0002",
+          "mutation_seq": 1,
+          "ts": "2026-01-05T09:00:01.000Z",
+          "actor": "ap_clerk",
+          "system": "docs",
+          "type": "ACCESS_DENIED",
+          "entity_type": "document",
+          "entity_id": "DOC-0025",
+          "payload_json": "{\"tool\":\"docs_get_document\",\"required_roles\":[\"ap_approver\"]}"
+        }
+      ],
+      "canonical": "[{\"actor\":\"ap_approver\",\"entity_id\":\"INV-2026-00347\",\"entity_type\":\"invoice\",\"event_id\":\"EVT-0001\",\"mutation_seq\":1,\"payload_json\":\"{\\\"payment_id\\\":\\\"PAY-0001\\\",\\\"amount_cents\\\":210000,\\\"approval_id\\\":\\\"APR-0001\\\"}\",\"system\":\"erp\",\"ts\":\"2026-01-05T09:00:01.000Z\",\"type\":\"PAYMENT_RELEASED\"},{\"actor\":\"ap_clerk\",\"entity_id\":\"DOC-0025\",\"entity_type\":\"document\",\"event_id\":\"EVT-0002\",\"mutation_seq\":1,\"payload_json\":\"{\\\"tool\\\":\\\"docs_get_document\\\",\\\"required_roles\\\":[\\\"ap_approver\\\"]}\",\"system\":\"docs\",\"ts\":\"2026-01-05T09:00:01.000Z\",\"type\":\"ACCESS_DENIED\"}]",
+      "sha256": "c86607ce996efe9670196fa31af7d345e6cc1e31d4ae6215a696634a0eda45c6"
+    },
+    {
+      "name": "control-characters",
+      "doc": {
+        "text": "line1\nline2\ttab\u0001end"
+      },
+      "canonical": "{\"text\":\"line1\\nline2\\ttab\\u0001end\"}",
+      "sha256": "d5029a949a7f8dbb349578a133047c91ca0e46463364748a7daa0b813607094e"
+    }
+  ]
+}

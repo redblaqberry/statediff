@@ -1,0 +1,7 @@
+{
+  "format": "statediff.capture-provenance.v1",
+  "upstream_commit": "8cd41d6b72841757c530489d4a0f62b6c98c0bc6",
+  "upstream_dirty": false,
+  "protocol_version": "2025-06-18",
+  "tool": "tools/capture_baselines.py"
+}

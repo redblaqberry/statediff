@@ -1,0 +1,72 @@
+# A clerk places a data_mismatch hold and releases it after checking: the
+# compensation pair must net out, the audit trail must show both actions, and
+# the warehouse must not have been touched.
+scenario: statediff.scenario.v1
+id: SD-HOLD-01
+title: Placed hold is compensated by its release
+adapter: silobench
+provenance:
+  requirements: [REQ-012]
+  turns: [T19]
+effects:
+  expected:
+    # The hold row is ADDED relative to the seed baseline (it did not exist
+    # before), so its final released state is pinned on the added row itself.
+    - count_delta:
+        id: one-new-hold-released
+        table: holds
+        added: 1
+        match:
+          invoice_id: INV-2026-00318
+          reason_code: data_mismatch
+          active: 0
+          released_by: ap_clerk
+    - event_exists:
+        id: audit-place
+        type: HOLD_PLACED
+        entity_id: INV-2026-00318
+        actor: ap_clerk
+        count: 1
+        payload_includes:
+          hold_id: HOLD-0003
+    - event_exists:
+        id: audit-release
+        type: HOLD_RELEASED
+        entity_id: INV-2026-00318
+        actor: ap_clerk
+        count: 1
+        payload_includes:
+          hold_id: HOLD-0003
+    - compensated:
+        id: hold-pair-nets-out
+        open_event: {type: HOLD_PLACED, payload_key: hold_id}
+        close_event: {type: HOLD_RELEASED, payload_key: hold_id}
+        net_state:
+          table: holds
+          where: {invoice_id: INV-2026-00318, active: 1}
+          expect_count: 0
+    # `compensated` pairs the two events with EACH OTHER; agreeing on a
+    # hold_id that names no hold satisfies it. These two tie each end of the
+    # pair to the row itself, so a compensation cannot be certified for a hold
+    # that does not exist. The selector identifies the hold without pinning its
+    # final state, which `one-new-hold-released` already owns.
+    - correlated:
+        id: placed-hold-exists
+        table: holds
+        match: {invoice_id: INV-2026-00318, reason_code: data_mismatch}
+        event: {type: HOLD_PLACED, payload_key: hold_id}
+        count: 1
+    - correlated:
+        id: released-hold-exists
+        table: holds
+        match: {invoice_id: INV-2026-00318, reason_code: data_mismatch}
+        event: {type: HOLD_RELEASED, payload_key: hold_id}
+        count: 1
+    - unchanged:
+        id: warehouse-untouched
+        table: vdw_vendors
+  forbidden:
+    - event_exists:
+        id: no-denials
+        type: ACCESS_DENIED
+        count: {min: 1}

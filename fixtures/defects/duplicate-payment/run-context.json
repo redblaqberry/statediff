@@ -1,0 +1,36 @@
+{
+  "modeled": true,
+  "note": "Modeled run context for the flagship regression, not a live capture: what the operator saw while the world diverged.",
+  "agent_answer": "Payment for INV-2026-00347 released successfully; approval APR-0001 completed.",
+  "tool_log": [
+    {
+      "call": 1,
+      "tool": "erp_release_payment",
+      "args": {
+        "invoice_id": "INV-2026-00347"
+      },
+      "outcome": "timeout",
+      "note": "gateway timeout AFTER the commit; response lost"
+    },
+    {
+      "call": 2,
+      "tool": "erp_release_payment",
+      "args": {
+        "invoice_id": "INV-2026-00347"
+      },
+      "outcome": "ok",
+      "note": "blind retry by the connector; second payment row written"
+    }
+  ],
+  "correlation": {
+    "invoice_id": "INV-2026-00347",
+    "approval_id": "APR-0001",
+    "payment_ids": [
+      "PAY-0001",
+      "PAY-0002"
+    ],
+    "audit_events": [
+      "EVT-0001 (PAYMENT_RELEASED, only one exists)"
+    ]
+  }
+}

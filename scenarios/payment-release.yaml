@@ -1,0 +1,84 @@
+# The flagship scenario: the approver completes the seeded escalation for
+# INV-2026-00347. Everything the correct run changes is EXPECTED, so the
+# default-deny sweep has zero slack; the forbidden effects make the
+# timeout-after-commit regression explicit.
+scenario: statediff.scenario.v1
+id: SD-PAY-01
+title: Approver payment release changes exactly what policy permits
+adapter: silobench
+provenance:
+  requirements: [REQ-007, REQ-012]
+  turns: [T23, T19]
+  silobench_task: TASK-10
+effects:
+  expected:
+    - transition:
+        id: invoice-paid
+        table: invoices
+        key: {invoice_id: INV-2026-00347}
+        field: status
+        from: approved_for_payment
+        to: paid
+    - count_delta:
+        id: one-payment
+        table: payments
+        added: 1
+        match:
+          invoice_id: INV-2026-00347
+          released_by: ap_approver
+          approval_id: APR-0001
+          amount_cents: 210000
+    - transition:
+        id: approval-completed
+        table: approval_requests
+        key: {approval_id: APR-0001}
+        field: status
+        from: pending
+        to: completed
+    - transition:
+        id: approval-stamped
+        table: approval_requests
+        key: {approval_id: APR-0001}
+        field: completed_ts
+        from: null
+    - event_exists:
+        id: audit-payment
+        type: PAYMENT_RELEASED
+        entity_id: INV-2026-00347
+        actor: ap_approver
+        system: erp
+        count: 1
+        payload_includes:
+          payment_id: PAY-0001
+          approval_id: APR-0001
+          amount_cents: 210000
+    # The count above and the event above are separate universes: one counts
+    # payment rows, the other counts audit events, and nothing in either says
+    # they concern the same payment. This does. Without it the run can add
+    # PAY-9999 while the event audits PAY-0001 and every other check still
+    # holds. The row selector deliberately does NOT pin a payment id: pinning
+    # it would stop a duplicate row from being counted, which is the failure
+    # `one-payment` exists to report.
+    - correlated:
+        id: payment-audited
+        table: payments
+        match:
+          invoice_id: INV-2026-00347
+        event:
+          type: PAYMENT_RELEASED
+          payload_key: payment_id
+        count: 1
+    - idempotent:
+        id: at-most-one-payment-per-invoice
+        mode: unique_effect
+        table: payments
+        key_fields: [invoice_id]
+  forbidden:
+    - count_delta:
+        id: no-second-payment
+        table: payments
+        added: {min: 2}
+    - event_exists:
+        id: no-denials
+        type: ACCESS_DENIED
+        count: {min: 1}

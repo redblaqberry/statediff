@@ -1,0 +1,3 @@
+{"format":"event-log.v1","seed":4711,"schema_version":1,"docs_outage":false,"events":2}
+{"event_id":"EVT-0001","mutation_seq":1,"ts":"2026-01-05T09:00:01.000Z","actor":"ap_clerk","system":"erp","type":"HOLD_PLACED","entity_type":"invoice","entity_id":"INV-2026-00318","payload":{"hold_id":"HOLD-0003","reason_code":"data_mismatch","note":"Quantity check against PO-2026-0144 pending"}}
+{"event_id":"EVT-0002","mutation_seq":2,"ts":"2026-01-05T09:00:02.000Z","actor":"ap_clerk","system":"erp","type":"HOLD_RELEASED","entity_type":"invoice","entity_id":"INV-2026-00318","payload":{"hold_id":"HOLD-0003","reason_code":"data_mismatch","note":null}}

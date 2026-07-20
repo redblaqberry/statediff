@@ -1,0 +1,2 @@
+{"format":"event-log.v1","seed":4711,"schema_version":1,"docs_outage":false,"events":1}
+{"event_id":"EVT-0001","mutation_seq":1,"ts":"2026-01-05T09:00:01.000Z","actor":"ap_approver","system":"erp","type":"PAYMENT_RELEASED","entity_type":"invoice","entity_id":"INV-2026-00347","payload":{"payment_id":"PAY-0001","amount_cents":210000,"approval_id":"APR-0001"}}

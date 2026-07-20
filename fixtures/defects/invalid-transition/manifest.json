@@ -1,0 +1,12 @@
+{
+  "defect_class": "invalid-transition",
+  "derived_from": "baseline/payment/after-snapshot.json",
+  "before": "baseline/payment/before-snapshot.json",
+  "scenario": "scenarios/payment-release.yaml",
+  "expect": {
+    "status": "fail",
+    "failing_checks_include": [
+      "invoice-paid"
+    ]
+  }
+}

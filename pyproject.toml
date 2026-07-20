@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "statediff"
+version = "0.1.0"
+description = "State oracle for agent evaluation: grades whether an agent produced the permitted world-state transition, from before/after snapshots and an append-only audit log."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Mateusz Sliwinski" }]
+dependencies = [
+  "pydantic>=2.5",
+  "typer>=0.12",
+  "pyyaml>=6.0",
+]
+
+[project.scripts]
+statediff = "statediff.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/statediff"]
