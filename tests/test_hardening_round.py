@@ -109,3 +109,48 @@ def test_error_verdict_survives_a_null_provenance():
     v = evaluate(broken, clean_pair("payment"))
     assert v.status == "error"
     assert v.provenance is None
+
+
+def test_deeply_nested_event_payload_is_artifact_error(tmp_path):
+    """The fifth member of the deep-nesting family: the payload_json STRING
+    embedded in a snapshot's own events table is decoded long after the file
+    itself parsed, so a hash-valid artifact still crashed the run with a
+    RecursionError traceback and exit 1. The refusal now lives in
+    strict_json_loads, so every decode site inherits it at once."""
+    import json as _json
+
+    from statediff.adapter import compute_hashes, load_snapshot
+
+    raw = _json.loads(
+        (FIXTURES / "baseline" / "hold" / "after-snapshot.json").read_text(encoding="utf-8")
+    )
+    events = raw["tables"]["events"]
+    assert events, "the hold/after fixture is expected to carry event rows"
+    depth = 12000
+    events[-1]["payload_json"] = "[" * depth + "]" * depth
+    raw.update(compute_hashes(raw["meta"], raw["tables"]))
+    poisoned = tmp_path / "after-snapshot.json"
+    poisoned.write_text(_json.dumps(raw), encoding="utf-8")
+    with pytest.raises(ArtifactError, match="nested too deeply"):
+        load_snapshot(poisoned)
+
+
+def test_min_zero_count_asserts_nothing_and_is_an_error():
+    """`count: {min: 0}` on an expected effect could never fail, satisfied the
+    at-least-one-expected requirement, passed over a run where nothing
+    happened, and covered whatever it matched, walking appended events past
+    the unexplained sweep. It bounds exactly as much as an empty Bounds, and
+    is refused the same way."""
+    sc = load_scenario(SCENARIOS / "hold-compensation.yaml")
+    vacuous = scenario_with({"expected": [
+        {"event_exists": {"id": "covers-anything", "type": "ACCESS_DENIED",
+                          "count": {"min": 0}}},
+    ]}).effects
+    broken = sc.model_copy(update={"effects": vacuous})
+    unchanged = load_pair(
+        FIXTURES / "baseline" / "hold" / "before-snapshot.json",
+        FIXTURES / "baseline" / "hold" / "before-snapshot.json",
+    )
+    v = evaluate(broken, unchanged)
+    assert v.status == "error"
+    assert "asserts nothing" in v.error

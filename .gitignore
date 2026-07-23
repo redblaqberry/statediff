@@ -5,6 +5,9 @@ __pycache__/
 dist/
 *.egg-info/
 
+# the quickstart pipes a verdict here
+/verdict.json
+
 # local notes
 SESSION-HANDOFF.md
 *.local.md

@@ -97,6 +97,15 @@ def require_count_spec(where: str, spec: Any) -> None:
                 f"{where} carries neither a min nor a max, so it bounds nothing and "
                 "every count satisfies it"
             )
+        # `{min: 0}` with no max is the same assertion wearing a number: every
+        # possible count is at least zero, so it can never fail, it counts as an
+        # expected effect that "asserted" something, and whatever it matches it
+        # covers, walking appended events past the unexplained sweep.
+        if spec.min == 0 and spec.max is None:
+            raise ScenarioError(
+                f"{where} wants at least zero matches with no upper bound; every "
+                "count satisfies that, so it asserts nothing"
+            )
         if spec.min is not None and spec.max is not None and spec.min > spec.max:
             raise ScenarioError(
                 f"{where} wants at least {spec.min} and at most {spec.max}, "

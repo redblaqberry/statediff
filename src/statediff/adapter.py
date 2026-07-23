@@ -199,7 +199,24 @@ def strict_json_loads(text: str, source: str) -> Any:
         value = json.loads(text, object_pairs_hook=_reject_duplicate_keys)
     except ArtifactError as exc:
         raise ArtifactError(f"{source}: {exc}") from exc
-    _require_json_domain(source, value)
+    except RecursionError as exc:
+        # A document nested thousands of arrays deep exhausts the parser's
+        # stack, and RecursionError is a RuntimeError, not a JSONDecodeError,
+        # so call sites catching decode errors never see it. Caught HERE for
+        # the same reason the domain check lives here: the outer file, JSONL
+        # record, and bundle manifest paths each grew their own catch, and the
+        # payload_json string embedded in a snapshot's event rows then still
+        # crashed with a traceback and exit 1 where a malformed artifact must
+        # become an error verdict and exit 2. Every decode site inherits this
+        # one.
+        raise ArtifactError(f"{source}: JSON nested too deeply to parse") from exc
+    try:
+        _require_json_domain(source, value)
+    except RecursionError as exc:
+        # The domain walk and the parser spend different amounts of stack per
+        # level, so a value the parser just barely decoded can still exhaust
+        # the stack here.
+        raise ArtifactError(f"{source}: JSON nested too deeply to parse") from exc
     return value
 
 

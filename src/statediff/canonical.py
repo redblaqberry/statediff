@@ -72,9 +72,13 @@ def _write(value: Any, out: list[str]) -> None:
         out.append("]")
     elif isinstance(value, dict):
         out.append("{")
-        for index, key in enumerate(sorted(value.keys(), key=_utf16_key)):
+        # Checked before sorting: the sort key calls .encode on every key, so a
+        # non-string key would surface as an AttributeError from inside sorted()
+        # rather than as the refusal this function promises.
+        for key in value.keys():
             if not isinstance(key, str):
                 raise CanonicalError(f"non-string object key: {key!r}")
+        for index, key in enumerate(sorted(value.keys(), key=_utf16_key)):
             if index:
                 out.append(",")
             out.append(json.dumps(key, ensure_ascii=False))

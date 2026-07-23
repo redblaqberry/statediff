@@ -25,7 +25,7 @@ Requires Python >= 3.10 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync
-uv run pytest          # 277 tests incl. the 600-case defect detection matrix
+uv run pytest          # 280 tests incl. the 600-case defect detection matrix
 
 # The correct run passes: every change the approver's payment release made is
 # expected, and nothing else changed.

@@ -43,3 +43,13 @@ def test_strict_equal_separates_booleans_integers_and_floats():
     assert not strict_equal(210000, 210000.0)
     assert not strict_equal({"amount_cents": 210000}, {"amount_cents": 210000.0})
     assert not strict_equal([210000], [210000.0])
+
+
+def test_non_string_object_key_is_a_canonical_error():
+    # The promised refusal, not an AttributeError: the sort key calls .encode
+    # on every key, so the type check has to run before sorting or a library
+    # caller passing {1: "x"} got a crash instead of the refusal.
+    with pytest.raises(CanonicalError, match="non-string object key"):
+        canonical_json({1: "x"})
+    with pytest.raises(CanonicalError, match="non-string object key"):
+        canonical_json({"outer": [{True: "x"}]})

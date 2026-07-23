@@ -1086,6 +1086,7 @@ def test_a_count_no_set_of_matches_can_have_is_refused_at_evaluation():
         (mutated(forbidden_events, "count", -1), "negative size"),
         (mutated(forbidden_events, "count", Bounds.model_construct(min=5, max=1)), "no count can satisfy"),
         (mutated(forbidden_events, "count", Bounds.model_construct(min=None, max=None)), "bounds nothing"),
+        (mutated(forbidden_events, "count", Bounds.model_construct(min=0, max=None)), "asserts nothing"),
         (mutated(forbidden_events, "count", Bounds.model_construct(min=-1, max=None)), "negative size"),
         (mutated(forbidden_events, "count", 1.0), "not a whole number"),
         (mutated(forbidden_events, "count", True), "not a whole number"),
